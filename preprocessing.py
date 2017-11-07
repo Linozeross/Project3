@@ -30,7 +30,7 @@ def binarize (image, threshold="threshold"):
     image[~mask] = 0
     image[mask] = 1
     
-    return image
+    return image.astype(int)
 
 def take_lines_from(url, number=5):
     """ Takes the N first lines of a file and puts them into a new file
@@ -61,9 +61,9 @@ def take_lines_from(url, number=5):
     
 
 def spltDataset(X,Y,size_test, seed=None):
-    
-    
     X_train, X_test, Y_train, Y_test=train_test_split(X,Y,test_size=size_test,random_state=seed)
     
     return X_train, Y_train, X_test, Y_test
 
+def write_file(url,matrix):
+    np.savetxt(url, matrix, delimiter=',', fmt='%s')  
