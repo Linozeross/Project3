@@ -6,6 +6,7 @@ Created on Tue Oct 31 23:18:51 2017
 """
 
 import numpy   as np 
+from sklearn.model_selection import train_test_split
 
 def binarize (image, threshold="threshold"):
     """ Binarizes an image passed as a numpy matrix
@@ -26,8 +27,8 @@ def binarize (image, threshold="threshold"):
     zeros_indexes= image < threshold
     mask = np.ones(image.shape,dtype=bool) #np.ones_like(a,dtype=bool)
     mask[zeros_indexes] = False
-    image[~mask] = 255
-    image[mask] = 0
+    image[~mask] = 0
+    image[mask] = 1
     
     return image
 
@@ -57,4 +58,12 @@ def take_lines_from(url, number=5):
     except Exception as e:
         print(str(e))
         return None
+    
+
+def spltDataset(X,Y,size_test, seed=None):
+    
+    
+    X_train, X_test, Y_train, Y_test=train_test_split(X,Y,test_size=size_test,random_state=seed)
+    
+    return X_train, Y_train, X_test, Y_test
 
