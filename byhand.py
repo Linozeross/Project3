@@ -73,43 +73,40 @@ class FFN:
 	def backward(self, expected,learning_rate=0.1): 
 		self.alpha=learning_rate
 
-		# did not recompute the thing 
-		error = self.oOutput - array(expected, dtype=float)
+		# computing error
+		format_expected = mat(expected)
+		expected= format_expected.reshape(1,len(expected)).transpose()
+		error=subtract(self.oOutput, expected)
+
 
 		# calculating delta 
 		# outer delta 
-		#self.oDelta = (1- self.oOutput)*self.oOutput * error
-		self.oDelta = (1- sigmoid(self.oActivation))*sigmoid(self.oActivation)* error
+		self.oDelta = multiply( multiply((1- sigmoid(self.oActivation)) , sigmoid(self.oActivation))  , error)
 
 		# adjust hidden layer 
+
 		for i in list(reversed(range( self.nLayer ))):
 			if i == self.nLayer-1:
-				# print self.oWeights.shape
-				# print self.oDelta.shape
-				# print self.hActivation[i].shape
-				# sys.exit()
-				self.hDelta[i]=(1 - sigmoid(self.hActivation[i]))*(sigmoid(self.hActivation[i]))*dot(self.oWeights[0:,:-1].transpose(), self.oDelta)
+				self.hDelta[i]=multiply(multiply((1 - sigmoid(self.hActivation[i])), (sigmoid(self.hActivation[i]))) , dot(self.oWeights[0:,:-1].transpose(), self.oDelta))
 			elif i != self.nLayer-1:
-				self.hDelta[i]=(1 - sigmoid(self.hActivation[i]))*(sigmoid(self.hActivation[i]))*dot(self.hWeights[i+1][0:,:-1].transpose(), self.hDelta[i+1])
+				# print dot(self.hWeights[i+1][0:,:-1].transpose(), self.hDelta[i+1]).shape
+				# print (1 - sigmoid(self.hActivation[i])).shape
+				# print sigmoid(self.hActivation[i]).shape
+				# sys.exit()
+				self.hDelta[i]=multiply(multiply((1 - sigmoid(self.hActivation[i])), (sigmoid(self.hActivation[i]))) , dot(self.hWeights[i+1][0:,:-1].transpose(), self.hDelta[i+1]) )
 		
 		#applying delta weight change 
-		# Outer output change
 		self.oWeights = self.oWeights - self.alpha*dot(self.oDelta, self.hOutput[-1].transpose())
 
 		#hidden output change ... now doing 'forward' changds
 		for i in range( self.nLayer ):
 			if i== 0:
-				# print self.hDelta[i].shape
-				# print self.iOutput.transpose().shape
-				# print dot(self.hDelta[i], self.iOutput.transpose()).shape
-				# print self.hWeights[i].shape
-				# sys.exit()
 
 				self.hWeights[i]=self.hWeights[i] - self.alpha * dot(self.hDelta[i], self.iOutput.transpose())
 
 			elif i != 0:
 				self.hWeights[i]=self.hWeights[i] - self.alpha * dot(self.hDelta[i], self.hOutput[i-1].transpose())
-	
+				
 	def train_network(self,X_train,y_train, learning_rate=0.1):
 		# assuming x_train  and y_train are arrays of arrays
 		for index,row in enumerate(X_train):
@@ -117,7 +114,7 @@ class FFN:
 			self.forward(row)
 			self.backward(expected,learning_rate)
 
-	def predict(self,X_test):
+	def predict_batch(self,X_test):
 
 		def convert_to_true_labels(a):
 			true_labels=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 24, 25, 27, 28, 30, 32, 35, 36, 40, 42, 45, 48, 49, 54, 56, 63, 64, 72, 81] 
@@ -127,10 +124,18 @@ class FFN:
 		y_result=[]
 		for index, row in enumerate(X_test):
 			outputs=self.forward(row)
-			outputs=outputs.flatten().tolist()
-			#outputs = outputs.index(max(outputs))
+			outputs=outputs.flatten().tolist()[0]
+			#outputs = outputs.index(max(outputs)) # comment this out if want to output original probabilities
+			print outputs
+
 			y_result.append(outputs)
 		return y_result
+
+	def predict(self, inp):
+		outputs=self.forward(inp)
+		outputs=outputs.flatten().tolist()
+
+		return outputs
 
 	def getOutput(self):
 		return self.oOutput
