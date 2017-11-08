@@ -128,9 +128,8 @@ class FFN:
 		for index, row in enumerate(X_test):
 			outputs=self.forward(row)
 			outputs=outputs.flatten().tolist()
-			print outputs
-			result = outputs.index(max(outputs))
-			y_result.append(result)
+			#outputs = outputs.index(max(outputs))
+			y_result.append(outputs)
 		return y_result
 
 	def getOutput(self):
@@ -154,7 +153,8 @@ if __name__ == '__main__':
 	y_train=[[0,1],[0,1],[0,1],[1,0]]
 
 	ffn = FFN(num_in=2, num_hidden=4, num_layer=1, num_out=2)
-	for i in range(20):
+	epochs=60000
+	for i in range(epochs):
 		ffn.train_network(X_train,y_train,learning_rate=0.05)
 	print 'finish training'
 	print ffn.predict([[1,1]])
