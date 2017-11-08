@@ -25,7 +25,7 @@ class FFN:
 		# the length of array represents the number of hidden layers
 		# assume number of neurons in each layers is the same
 		self.hWeights=[random.random((self.nHidden, self.nIn+1))]
-		self.hWeights.extend([random.random((self.nHidden, self.nHidden)) for i in range(self.nLayer-1)])
+		self.hWeights.extend([random.random((self.nHidden, self.nHidden+1)) for i in range(self.nLayer-1)])
 
 		#self.oWeights=[random.random((self.nOut, self.nHidden)) for i in range(self.nLayer)] # different from tutorial
 		self.oWeights= random.random((self.nOut , self.nHidden+1))
@@ -89,7 +89,7 @@ class FFN:
 				# print self.hActivation[i].shape
 				# sys.exit()
 				self.hDelta[i]=(1 - sigmoid(self.hActivation[i]))*(sigmoid(self.hActivation[i]))*dot(self.oWeights[0:,:-1].transpose(), self.oDelta)
-			elif i != len(self.nLayer)-1:
+			elif i != self.nLayer-1:
 				self.hDelta[i]=(1 - sigmoid(self.hActivation[i]))*(sigmoid(self.hActivation[i]))*dot(self.hWeights[i+1][0:,:-1].transpose(), self.hDelta[i+1])
 		
 		#applying delta weight change 
