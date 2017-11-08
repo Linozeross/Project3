@@ -1,5 +1,6 @@
 from numpy import * 
 import sys
+import numpy as np
 
 
 '''
