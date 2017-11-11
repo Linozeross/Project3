@@ -1,6 +1,5 @@
 from numpy import * 
 import sys
-import numpy as np
 
 
 '''
@@ -44,7 +43,7 @@ class FFN:
 
 		# deltas for neurons
 		# QUESTION: why not nHidden+1 ??
-		self.hDelta = [zeros((self.nHidden,1),dtype=float) for i in range(self.nLayer)]
+		self.hDelta = [zeros((self.nHidden),dtype=float) for i in range(self.nLayer)]
 		self.oDelta = zeros((self.nOut), dtype = float)
 
 	
@@ -56,10 +55,11 @@ class FFN:
 
 		# hidden layer
 		for i in range(self.nLayer):
-			if i == self.nLayer-1:
+			if i == 0:
 				self.hActivation[i]=dot(self.hWeights[i], self.iOutput)
 				self.hOutput[i][:-1,:]=sigmoid(self.hActivation[i])
 			else:
+
 				self.hActivation[i]=dot(self.hWeights[i], self.hOutput[i-1])
 				self.hOutput[i][:-1, :]=sigmoid(self.hActivation[i])
 			self.hOutput[i][-1:, :]=1.0
@@ -90,10 +90,6 @@ class FFN:
 			if i == self.nLayer-1:
 				self.hDelta[i]=multiply(multiply((1 - sigmoid(self.hActivation[i])), (sigmoid(self.hActivation[i]))) , dot(self.oWeights[0:,:-1].transpose(), self.oDelta))
 			elif i != self.nLayer-1:
-				# print dot(self.hWeights[i+1][0:,:-1].transpose(), self.hDelta[i+1]).shape
-				# print (1 - sigmoid(self.hActivation[i])).shape
-				# print sigmoid(self.hActivation[i]).shape
-				# sys.exit()
 				self.hDelta[i]=multiply(multiply((1 - sigmoid(self.hActivation[i])), (sigmoid(self.hActivation[i]))) , dot(self.hWeights[i+1][0:,:-1].transpose(), self.hDelta[i+1]) )
 		
 		#applying delta weight change 
@@ -107,11 +103,11 @@ class FFN:
 
 			elif i != 0:
 				self.hWeights[i]=self.hWeights[i] - self.alpha * dot(self.hDelta[i], self.hOutput[i-1].transpose())
-				
+	
 	def train_network(self,X_train,y_train, learning_rate=0.1):
 		# assuming x_train  and y_train are arrays of arrays
 		for index,row in enumerate(X_train):
-			expected = y_train[index][0]
+			expected = y_train[index]
 			self.forward(row)
 			self.backward(expected,learning_rate)
 
@@ -126,7 +122,7 @@ class FFN:
 		for index, row in enumerate(X_test):
 			outputs=self.forward(row)
 			outputs=outputs.flatten().tolist()[0]
-			#outputs = outputs.index(max(outputs)) # comment this out if want to output original probabilities
+			outputs = outputs.index(max(outputs)) # comment this out if want to output original probabilities
 			print outputs
 
 			y_result.append(outputs)
@@ -154,16 +150,19 @@ def convert_to_neural_input(y_labels):
 		result.append(array_label)
 	return result
 	pass
-if __name__ == '__main__':
-	X_train = [[0,0],[0,1],[0,0],[1,1]]
-	y_train=[[0,1],[0,1],[0,1],[1,0]]
 
-	ffn = FFN(num_in=2, num_hidden=4, num_layer=1, num_out=2)
-	epochs=60000
-	for i in range(epochs):
+
+if __name__ == '__main__':
+
+	X_train = list(reversed([[1,0,2],[0,3,1],[0,3,1],[1,2,1]]))
+	y_train=[[1,0],[1,0],[0,1],[1,0]]
+
+	ffn = FFN(num_in=3, num_hidden=4, num_layer=1, num_out=2)
+	rounds=60
+	for i in range(rounds):
 		ffn.train_network(X_train,y_train,learning_rate=0.05)
 	print 'finish training'
-	print ffn.predict([[1,1]])
+	print ffn.predict_batch(X_train)
 
 	
 	
