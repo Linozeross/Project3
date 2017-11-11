@@ -28,11 +28,11 @@ def binarize (image, threshold="threshold"):
     mask = np.ones(image.shape,dtype=bool) #np.ones_like(a,dtype=bool)
     mask[zeros_indexes] = False
     image[~mask] = 0
-    image[mask] = 1
+    image[mask] = 255
     
     return image.astype(int)
 
-def take_lines_from(url, number=5):
+def take_lines_from(url, newname="small",number=5):
     """ Takes the N first lines of a file and puts them into a new file
 
     Args:
@@ -52,7 +52,7 @@ def take_lines_from(url, number=5):
                 break
             lines.append(line)
             i=i+1
-        f=open('small_'+url,'w')
+        f=open(newname+'_'+url,'w')
         for line in lines:
             f.write(line)
     except Exception as e:
