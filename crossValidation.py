@@ -53,8 +53,10 @@ def tune_epochs(x, y, k, input_neurons, hidden_neurons, layers, output_neurons, 
                 #trains the network
                 NN.train_network(x[train_index],y[train_index], learning_rate)
                 
+                
                 #gets prediction over validation
-                prediction=NN.predict(x[validation_index])
+                prediction=NN.predict_batch(x[validation_index])
+                #print(prediction)
                 #Calculates validation error
                 err=mean_squared_error(y[validation_index], prediction)
                 valid_error.append(err)
@@ -76,6 +78,7 @@ def tune_epochs(x, y, k, input_neurons, hidden_neurons, layers, output_neurons, 
         #updates learning rate
         learning_rate=learning_decay(training_epoch,learning_rate)
     
+    f.close()
     #Returns the best epoch and the validation error
     return best_epoch, min_val_error
     
@@ -145,7 +148,7 @@ def cross_validation(k,x,y):
     best_epoch=None
     best_error=np.inf
      #Hidden layers
-    layers=1
+    layers=5
     
     while True:
         epoch, alpha, neurons, error=tune_neurons(X_train,Y_train,k,inp,layers,outp)

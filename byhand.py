@@ -122,8 +122,8 @@ class FFN:
 		for index, row in enumerate(X_test):
 			outputs=self.forward(row)
 			outputs=outputs.flatten().tolist()[0]
-			outputs = outputs.index(max(outputs)) # comment this out if want to output original probabilities
-			print outputs
+			#outputs = outputs.index(max(outputs)) # comment this out if want to output original probabilities
+			#sprint outputs
 
 			y_result.append(outputs)
 		return y_result
